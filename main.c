@@ -1,20 +1,18 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "header.h"
 
-// Deklaracije funkcija korištenih u main.c
 void meni_glavni(Komponenta** skladiste);
 void meni_admin(Komponenta** glava);
-void meni_korisnik(Komponenta* skladiste);
 
 int main(void) {
     Komponenta* skladiste = ucitaj_komponente_iz_datoteke("komponente.bin");
 
-    meni_glavni(&skladiste);  // Prenosimo adresu pokazivača kako bi se promjene sačuvale
+    meni_glavni(&skladiste);
 
-    if (!sacuvaj_komponente_u_datoteku("komponente.bin", skladiste)) {
+    if (!sacuvaj_komponente_u_datoteci("komponente.bin", skladiste)) {
         printf("Greška pri spremanju komponenti.\n");
     }
 
@@ -28,19 +26,19 @@ void meni_glavni(Komponenta** skladiste) {
 
     while (!kraj) {
         printf("\n--- Glavni izbornik ---\n");
-        printf("1. Administracija\n");
-        printf("2. Korisnicki izbornik \n");
-        printf("0. Izlaz\n");
+        printf("%d. Administracija\n", IZBORNIK_ADMIN);
+        printf("%d. Korisnicki izbornik \n", IZBORNIK_KORISNIK);
+        printf("%d. Izlaz\n", IZBORNIK_IZLAZ);
         izbor = ucitaj_int("Odaberite opciju: ");
 
         switch (izbor) {
-        case 1:
+        case IZBORNIK_ADMIN:
             meni_admin(skladiste);
             break;
-        case 2:
+        case IZBORNIK_KORISNIK:
             meni_korisnik(*skladiste);
             break;
-        case 0:
+        case IZBORNIK_IZLAZ:
             kraj = true;
             break;
         default:
