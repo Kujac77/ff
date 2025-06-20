@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,18 +44,20 @@ void izmijeni_komponentu(Komponenta* kom) {
     printf("Trenutni brand: %s\n", kom->brand);
     printf("Unesite novi brand (ENTER za preskakanje): ");
     char buffer[MAX_BREND];
-    fgets(buffer, MAX_BREND, stdin);
+    fgets(buffer, sizeof(buffer), stdin);
     if (buffer[0] != '\n') {
         buffer[strcspn(buffer, "\n")] = 0;
-        strncpy(kom->brand, buffer, MAX_BREND);
+        strncpy(kom->brand, buffer, MAX_BREND - 1);
+        kom->brand[MAX_BREND - 1] = '\0';
     }
 
     printf("Trenutni model: %s\n", kom->model);
     printf("Unesite novi model (ENTER za preskakanje): ");
-    fgets(buffer, MAX_MODEL, stdin);
+    fgets(buffer, sizeof(buffer), stdin);
     if (buffer[0] != '\n') {
         buffer[strcspn(buffer, "\n")] = 0;
-        strncpy(kom->model, buffer, MAX_MODEL);
+        strncpy(kom->model, buffer, MAX_MODEL - 1);
+        kom->model[MAX_MODEL - 1] = '\0';
     }
 
     printf("Trenutna cijena: %.2f\n", kom->cijena);
@@ -74,7 +76,7 @@ void izmijeni_komponentu(Komponenta* kom) {
 }
 
 void meni_admin(Komponenta** glava) {
-    char unos[20];
+    char unos[64];
     int izbor;
     bool autentificiran = false;
 
@@ -96,6 +98,10 @@ void meni_admin(Komponenta** glava) {
         printf("4. Obrisi komponentu\n");
         printf("5. Spremi komponente u datoteku\n");
         printf("6. Ucitaj komponente iz datoteke\n");
+        printf("7. Prikazi velicinu datoteke\n");
+        printf("8. Kopiraj datoteku (backup)\n");
+        printf("9. Preimenuj datoteku\n");
+        printf("10. Obrisi datoteku\n");
         printf("0. Izlaz\n");
         izbor = ucitaj_int("Odaberite opciju: ");
 
@@ -121,7 +127,7 @@ void meni_admin(Komponenta** glava) {
             break;
         }
         case 5:
-            if (sacuvaj_komponente_u_datoteku("komponente.bin", *glava))
+            if (sacuvaj_komponente_u_datoteci("komponente.bin", *glava))
                 printf("Komponente su uspjesno spremljene.\n");
             else
                 printf("Greška pri spremanju komponenti.\n");
@@ -133,6 +139,31 @@ void meni_admin(Komponenta** glava) {
                 printf("Komponente su uspješno učitane.\n");
             else
                 printf("Greška pri učitavanju komponenti.\n");
+            break;
+        case 7:
+            prikazi_velicinu_datoteke("komponente.bin");
+            break;
+        case 8:
+            if (kopiraj_datoteku("komponente.bin", "backup_komponente.bin"))
+                printf("Backup OK.\n");
+            else
+                printf("Backup nije uspio.\n");
+            break;
+        case 9: {
+            char novo[64];
+            printf("Unesite novo ime: ");
+            scanf("%63s", novo); isprazni_buffer();
+            if (preimenuj_datoteku("komponente.bin", novo))
+                printf("Preimenovano.\n");
+            else
+                printf("Preimenovanje nije uspjelo.\n");
+            break;
+        }
+        case 10:
+            if (obrisi_datoteku("komponente.bin"))
+                printf("Obrisano.\n");
+            else
+                printf("Brisanje nije uspjelo.\n");
             break;
         case 0:
             autentificiran = false;
